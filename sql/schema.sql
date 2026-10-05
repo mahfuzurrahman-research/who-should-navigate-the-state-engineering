@@ -1,0 +1,10 @@
+CREATE SCHEMA staging;
+CREATE SCHEMA core;
+CREATE SCHEMA mart;
+CREATE SCHEMA quality;
+CREATE TABLE staging.encounters AS SELECT * FROM read_csv_auto('data/synthetic/encounters.csv', header=true);
+CREATE TABLE staging.psu_registry AS SELECT * FROM read_csv_auto('data/synthetic/psu_registry.csv', header=true);
+CREATE TABLE core.dim_psu AS SELECT CAST(psu_id AS VARCHAR) AS psu_id, CAST(stratum_id AS VARCHAR) AS stratum_id, CAST(region AS VARCHAR) AS region FROM staging.psu_registry;
+ALTER TABLE core.dim_psu ADD PRIMARY KEY (psu_id);
+CREATE TABLE core.fact_encounter AS SELECT CAST(encounter_id AS VARCHAR) AS encounter_id, CAST(region AS VARCHAR) AS region, CAST(stratum_id AS VARCHAR) AS stratum_id, CAST(psu_id AS VARCHAR) AS psu_id, CAST(service_type AS VARCHAR) AS service_type, CAST(redirect_flag AS INTEGER) AS redirect_flag, CAST(attained_flag AS INTEGER) AS attained_flag, CAST(weight AS DOUBLE) AS weight FROM staging.encounters;
+ALTER TABLE core.fact_encounter ADD PRIMARY KEY (encounter_id);

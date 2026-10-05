@@ -1,0 +1,29 @@
+name: public-validation
+on:
+  push:
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+      - name: Install R
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y r-base-core
+      - name: Run public demo
+        run: ./run_public_demo.sh
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+      - name: Verify public boundary
+        run: |
+          test ! -e manuscript
+          test ! -e supplement
+          test ! -e reference
+          test ! -e validation
+          test ! -e provenance
