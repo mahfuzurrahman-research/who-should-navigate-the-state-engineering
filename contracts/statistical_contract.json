@@ -1,0 +1,17 @@
+{
+  "protocol": "synthetic-wls-v1",
+  "seed": 20261006,
+  "synthetic_only": true,
+  "private_data_used": false,
+  "scientific_results_claimed": false,
+  "service_levels": ["A", "B", "C"],
+  "service_reference": "A",
+  "features": ["intercept", "redirect_flag", "complexity", "assist_flag", "redirect_x_complexity", "service_B", "service_C"],
+  "weight_semantics": "synthetic positive relative analysis weights",
+  "weight_normalization": "raw_weight / mean(raw_weight)",
+  "covariance": ["psu_cluster_CR1", "stratum_centered_scores"],
+  "absolute_tolerance": 1e-10,
+  "relative_tolerance": 1e-8,
+  "condition_limit": 1000000.0,
+  "generation": {"strata": 6, "psus_per_stratum": 4, "rows_per_psu": 12}
+}

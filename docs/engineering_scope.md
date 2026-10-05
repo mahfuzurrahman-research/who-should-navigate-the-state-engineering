@@ -4,12 +4,16 @@
 
 - deterministic synthetic data generation
 - schema and domain validation
-- weighted aggregation
-- cross-language Python/R parity
+- weighted aggregation and synthetic weighted least squares
+- independent Python/R design, coefficient, prediction, residual, and covariance parity
+- ordered feature/reference contracts and weight lineage
+- PSU-cluster and stratum-centered score conventions with explicit corrections
+- hand-calculated analytical oracle and weight-scale invariants
 - DuckDB staging/core/mart design
 - SQL joins, grouped summaries, window functions, and QA queries
 - automated tests and negative-path checks
-- CI and Docker reproducibility
+- CI and Docker configuration, with execution claims separated from configuration
+- staged statistical artifacts and unsigned consistency receipts
 - JSON/Markdown/HTML reporting
 
 ## Not demonstrated here

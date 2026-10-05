@@ -5,3 +5,4 @@ outputs/*
 !outputs/.gitkeep
 *.duckdb
 .DS_Store
+.pytest_cache/

@@ -1,5 +1,6 @@
 from __future__ import annotations
 import csv
+import math
 from pathlib import Path
 
 REQUIRED_ENCOUNTER_COLUMNS = {"encounter_id","region","stratum_id","psu_id","service_type","redirect_flag","attained_flag","weight"}
@@ -17,9 +18,9 @@ def validate(encounters: list[dict[str, str]], registry: list[dict[str, str]]) -
         raise ContractError("encounters are empty")
     if not registry:
         raise ContractError("registry is empty")
-    if set(encounters[0]) != REQUIRED_ENCOUNTER_COLUMNS:
+    if any(set(row) != REQUIRED_ENCOUNTER_COLUMNS for row in encounters):
         raise ContractError("encounter schema mismatch")
-    if set(registry[0]) != REQUIRED_PSU_COLUMNS:
+    if any(set(row) != REQUIRED_PSU_COLUMNS for row in registry):
         raise ContractError("registry schema mismatch")
     encounter_ids = [r["encounter_id"] for r in encounters]
     if len(encounter_ids) != len(set(encounter_ids)):
@@ -45,8 +46,8 @@ def validate(encounters: list[dict[str, str]], registry: list[dict[str, str]]) -
             raise ContractError("missing design field")
         try:
             weight = float(row["weight"])
-        except ValueError as exc:
+        except (ValueError, TypeError) as exc:
             raise ContractError("invalid weight") from exc
-        if weight <= 0:
-            raise ContractError("nonpositive weight")
+        if not math.isfinite(weight) or weight <= 0:
+            raise ContractError("nonfinite or nonpositive weight")
     return {"status":"PASS","encounters":len(encounters),"psus":len(registry),"strata":len({r["stratum_id"] for r in registry}),"regions":len({r["region"] for r in registry})}

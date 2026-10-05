@@ -5,7 +5,7 @@ WITH checks AS (
     UNION ALL SELECT 'Q03_psu_fk_valid', (SELECT COUNT(*) FROM core.fact_encounter e LEFT JOIN core.dim_psu p USING(psu_id) WHERE p.psu_id IS NULL)
     UNION ALL SELECT 'Q04_redirect_domain', (SELECT COUNT(*) FROM core.fact_encounter WHERE redirect_flag NOT IN (0,1) OR redirect_flag IS NULL)
     UNION ALL SELECT 'Q05_attained_domain', (SELECT COUNT(*) FROM core.fact_encounter WHERE attained_flag NOT IN (0,1) OR attained_flag IS NULL)
-    UNION ALL SELECT 'Q06_positive_weight', (SELECT COUNT(*) FROM core.fact_encounter WHERE weight <= 0 OR weight IS NULL)
+    UNION ALL SELECT 'Q06_positive_weight', (SELECT COUNT(*) FROM core.fact_encounter WHERE weight <= 0 OR weight IS NULL OR NOT ISFINITE(weight))
     UNION ALL SELECT 'Q07_service_nonempty', (SELECT COUNT(*) FROM core.fact_encounter WHERE service_type IS NULL OR TRIM(service_type)='')
     UNION ALL SELECT 'Q08_region_nonempty', (SELECT COUNT(*) FROM core.fact_encounter WHERE region IS NULL OR TRIM(region)='')
     UNION ALL SELECT 'Q09_stratum_nonempty', (SELECT COUNT(*) FROM core.fact_encounter WHERE stratum_id IS NULL OR TRIM(stratum_id)='')

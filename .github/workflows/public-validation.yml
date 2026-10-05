@@ -2,9 +2,12 @@ name: public-validation
 on:
   push:
   pull_request:
+permissions:
+  contents: read
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -16,10 +19,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y r-base-core
-      - name: Run public demo
-        run: ./run_public_demo.sh
-      - name: Run tests
-        run: python -m unittest discover -s tests -v
+      - name: Run both synthetic demos and their tests
+        run: ./run_all_demos.sh
       - name: Verify public boundary
         run: |
           test ! -e manuscript
@@ -27,3 +28,12 @@ jobs:
           test ! -e reference
           test ! -e validation
           test ! -e provenance
+      - name: Docker build and run
+        run: |
+          docker build -t state-navigation-engineering .
+          docker run --rm state-navigation-engineering
+      - name: Upload public validation outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-statistical-validation
+          path: outputs/

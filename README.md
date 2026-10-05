@@ -6,73 +6,66 @@ This repository demonstrates the engineering patterns used around the private sc
 
 ## What this public repository demonstrates
 
-- Python analytical orchestration
-- R/Python cross-language numerical validation on synthetic data
-- DuckDB relational modeling
-- typed staging, core relations, and analytical marts
-- relational and domain QA gates
-- synthetic survey-style data generation
-- automated reporting
-- static dashboard generation
-- unit, integration, and failure-mode testing
-- GitHub Actions continuous integration
-- Docker-based reproducibility
+The statistical upgrade adds an independently fitted Python/R regression demonstration alongside the original weighted-summary warehouse and dashboard.
+
+| Capability | Executable evidence |
+|---|---|
+| Statistical validation | Python SVD and base-R QR weighted least squares; full coefficients, predictions, residuals, standard errors, and covariance comparison |
+| Feature integrity | Ordered feature contract, fixed reference category, explicit interaction, rank and condition gates, frozen design verification |
+| Weight integrity | Separate weight table, exact keyed joins, finite positive weights, recorded normalization, scale-invariance tests |
+| Cluster conventions | PSU-cluster CR1 and separately defined stratum-centered score covariance; no lonely-PSU fallback |
+| SQL quality | Independent feature/weight reconstruction and result reconciliation in DuckDB, plus the original relational warehouse |
+| Reproducibility | Required R execution, staged results, process lock, source/artifact hashes, CI and Docker commands |
+
+See [the local validation record](docs/statistical_validation_record.md) and [CV evidence](docs/cv_evidence.md).
 
 ## Architecture
 
-```text
-Synthetic encounter generator
-          │
-          ▼
-Schema / domain validation
-          │
-          ▼
-Python weighted analytics
-          │
-          ├──────────────┐
-          ▼              ▼
-   Python summary     R summary
-          │              │
-          └──────┬───────┘
-                 ▼
-        Cross-language parity
-                 │
-                 ▼
-       DuckDB staging layer
-                 │
-                 ▼
-         Core relational model
-                 │
-                 ▼
-          Analytical marts
-                 │
-                 ▼
-            QA gates
-                 │
-                 ▼
-      JSON / Markdown / HTML
+```mermaid
+flowchart TD
+    I["Fabricated raw tables"] --> C["Keyed input contracts"]
+    C --> P["Python SVD fit"]
+    I --> R["Independent R QR fit"]
+    P --> V["Design and result parity"]
+    R --> V
+    V --> Q["DuckDB reconstruction and QA"]
+    Q --> O["Verified run artifacts"]
 ```
 
 ## Synthetic data only
 
 All tracked records in `data/synthetic/` are generated specifically for this public repository. They are not samples, subsets, perturbations, or transformations of the private research data.
 
-The synthetic schema uses generic fields: `region`, `stratum_id`, `psu_id`, `service_type`, `redirect_flag`, `attained_flag`, and `weight`. These names are intentionally generic and are not a release of the private scientific variable dictionary.
+The original demonstration fabricates 192 encounters. The statistical demonstration separately fabricates 288 continuous-index observations, their weights, and a registry containing 24 PSUs across six strata. Its generic fields and values are not a release of the private scientific variable dictionary.
+
+Weights are **fabricated relative analysis weights**, not survey inclusion probabilities, population expansion factors, or frequency counts. The two covariance conventions are fully stated in [cross-language validation](docs/cross_language_validation.md). They do not establish the paper's canonical complex-survey estimator.
 
 ## Quick start
 
 ```bash
-python -m pip install -r requirements.txt
-./run_public_demo.sh
+python3 -m pip install -r requirements.txt
+# Install base R so Rscript is on PATH (or use the Docker command below).
+./run_all_demos.sh
 ```
 
-The demo regenerates deterministic synthetic data, validates input contracts, computes Python summaries, builds the DuckDB warehouse, executes relational QA, runs R/Python parity when `Rscript` is available, and generates JSON, Markdown, and HTML outputs.
+Both demos require `Rscript`; a missing runtime fails the run. The combined command runs both pipelines and their tests. The original outputs remain in `outputs/`; the new statistical artifacts are in `outputs/statistics/` and include both languages' design matrices and results, parity/SQL reports, a source manifest, and a hash receipt.
+
+Run the statistical pipeline or verify a completed artifact set independently:
+
+```bash
+python3 -m stat_validation.pipeline
+python3 -m stat_validation.pipeline --verify-only
+docker build -t state-navigation-engineering .
+docker run --rm state-navigation-engineering
+```
 
 Run tests with:
 
 ```bash
-python -m unittest discover -s tests -v
+python3 -m pytest -q tests tests_stats
 ```
+
+Local validation passed **94 tests**, **38 SQL checks** (15 original + 23 statistical), and **3,586 statistical Python/R numeric comparisons**. Docker execution and GitHub Actions status are separate from those local results; see [reproducibility](docs/reproducibility.md).
 
 ## Public / private boundary
 
